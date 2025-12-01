@@ -1,0 +1,49 @@
+# Environment variables (NEVER commit API keys!)
+.env
+
+# Logs and temporary files
+logs.txt
+*.log
+
+# Memory files
+memory.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.tmp
+
+# Test files (excluding from repo)
+test_*.py
+test_*
+
+# Raw data files (too large, not needed for judges)
+title.basics.tsv
+title.ratings.tsv
+*.tsv
+
+# Temporary/development files
+addmov
