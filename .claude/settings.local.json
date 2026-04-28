@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile cineguide.py)",
+      "Bash(timeout 5 python cineguide.py)",
+      "Bash(sqlite3 movies.db \".schema movies\")",
+      "Bash(python *)",
+      "Bash(git checkout *)"
+    ]
+  }
+}

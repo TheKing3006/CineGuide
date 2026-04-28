@@ -1,0 +1,302 @@
+{
+  "liked_movies": [
+    {
+      "title": "Iron Man",
+      "year": 2008,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 7.9,
+      "added_at": "2026-04-27T00:48:54.932541"
+    },
+    {
+      "title": "The Incredible Hulk",
+      "year": 2008,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 6.6,
+      "added_at": "2026-04-27T00:48:55.116782"
+    },
+    {
+      "title": "Iron Man 2",
+      "year": 2010,
+      "genre": "Action,Sci-Fi",
+      "rating": 6.9,
+      "added_at": "2026-04-27T00:48:55.320374"
+    },
+    {
+      "title": "Thor",
+      "year": 2011,
+      "genre": "Action,Fantasy",
+      "rating": 7.0,
+      "added_at": "2026-04-27T00:48:55.499143"
+    },
+    {
+      "title": "Captain America: The First Avenger",
+      "year": 2011,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 6.9,
+      "added_at": "2026-04-27T00:48:55.664256"
+    },
+    {
+      "title": "Iron Man 3",
+      "year": 2013,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 7.1,
+      "added_at": "2026-04-27T00:48:56.035273"
+    },
+    {
+      "title": "Thor: The Dark World",
+      "year": 2013,
+      "genre": "Action,Adventure,Fantasy",
+      "rating": 6.7,
+      "added_at": "2026-04-27T00:48:56.241254"
+    },
+    {
+      "title": "Captain America: The Winter Soldier",
+      "year": 2014,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 7.7,
+      "added_at": "2026-04-27T00:48:56.407498"
+    },
+    {
+      "title": "Guardians of the Galaxy",
+      "year": 2014,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 8.0,
+      "added_at": "2026-04-27T00:48:56.581499"
+    },
+    {
+      "title": "Avengers: Age of Ultron",
+      "year": 2015,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 7.3,
+      "added_at": "2026-04-27T00:48:56.752227"
+    },
+    {
+      "title": "Ant-Man",
+      "year": 2015,
+      "genre": "Action,Comedy,Sci-Fi",
+      "rating": 7.2,
+      "added_at": "2026-04-27T00:48:56.920572"
+    },
+    {
+      "title": "Captain America: Civil War",
+      "year": 2016,
+      "genre": "Action,Sci-Fi",
+      "rating": 7.8,
+      "added_at": "2026-04-27T00:48:57.086506"
+    },
+    {
+      "title": "Doctor Strange",
+      "year": 2016,
+      "genre": "Action,Adventure,Fantasy",
+      "rating": 7.5,
+      "added_at": "2026-04-27T00:48:57.256859"
+    },
+    {
+      "title": "Guardians of the Galaxy Vol. 2",
+      "year": 2017,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 7.6,
+      "added_at": "2026-04-27T00:48:57.427517"
+    },
+    {
+      "title": "Spider-Man: Homecoming",
+      "year": 2017,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 7.4,
+      "added_at": "2026-04-27T00:48:57.594021"
+    },
+    {
+      "title": "Thor: Ragnarok",
+      "year": 2017,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 7.9,
+      "added_at": "2026-04-27T00:48:57.770522"
+    },
+    {
+      "title": "Avengers: Infinity War",
+      "year": 2018,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 8.4,
+      "added_at": "2026-04-27T00:48:57.941936"
+    },
+    {
+      "title": "Ant-Man and the Wasp",
+      "year": 2018,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 7.0,
+      "added_at": "2026-04-27T00:48:58.107391"
+    },
+    {
+      "title": "Captain Marvel",
+      "year": 2019,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 6.7,
+      "added_at": "2026-04-27T00:48:58.276722"
+    },
+    {
+      "title": "Avengers: Endgame",
+      "year": 2019,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 8.4,
+      "added_at": "2026-04-27T00:48:58.437605"
+    },
+    {
+      "title": "Spider-Man: Far from Home",
+      "year": 2019,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 7.3,
+      "added_at": "2026-04-27T00:48:58.600821"
+    },
+    {
+      "title": "Black Widow",
+      "year": 2021,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 6.6,
+      "added_at": "2026-04-27T00:48:58.770872"
+    },
+    {
+      "title": "Shang-Chi and the Legend of the Ten Rings",
+      "year": 2021,
+      "genre": "Action,Adventure,Fantasy",
+      "rating": 7.3,
+      "added_at": "2026-04-27T00:48:58.932137"
+    },
+    {
+      "title": "Eternals",
+      "year": 2021,
+      "genre": "Action,Adventure,Fantasy",
+      "rating": 6.2,
+      "added_at": "2026-04-27T00:48:59.096504"
+    },
+    {
+      "title": "Spider-Man: No Way Home",
+      "year": 2021,
+      "genre": "Action,Adventure,Fantasy",
+      "rating": 8.2,
+      "added_at": "2026-04-27T00:48:59.277543"
+    },
+    {
+      "title": "Doctor Strange in the Multiverse of Madness",
+      "year": 2022,
+      "genre": "Action,Adventure,Fantasy",
+      "rating": 6.9,
+      "added_at": "2026-04-27T00:48:59.442906"
+    },
+    {
+      "title": "Thor: Love and Thunder",
+      "year": 2022,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 6.1,
+      "added_at": "2026-04-27T00:48:59.612241"
+    },
+    {
+      "title": "Black Panther: Wakanda Forever",
+      "year": 2022,
+      "genre": "Action,Adventure,Drama",
+      "rating": 6.6,
+      "added_at": "2026-04-27T00:48:59.827987"
+    },
+    {
+      "title": "Ant-Man and the Wasp: Quantumania",
+      "year": 2023,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 6.0,
+      "added_at": "2026-04-27T00:49:00.043934"
+    },
+    {
+      "title": "Guardians of the Galaxy Vol. 3",
+      "year": 2023,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 7.9,
+      "added_at": "2026-04-27T00:49:00.259719"
+    },
+    {
+      "title": "The Marvels",
+      "year": 2023,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 5.5,
+      "added_at": "2026-04-27T00:49:00.436610"
+    },
+    {
+      "title": "Deadpool & Wolverine",
+      "year": 2024,
+      "genre": "Action,Adventure,Comedy",
+      "rating": 7.5,
+      "added_at": "2026-04-27T00:49:00.610826"
+    },
+    {
+      "title": "Captain America: Brave New World",
+      "year": 2025,
+      "genre": "Action,Adventure,Sci-Fi",
+      "rating": 5.6,
+      "added_at": "2026-04-27T00:49:00.793265"
+    },
+    {
+      "title": "Dhoom",
+      "year": 2004,
+      "genre": "Action,Crime,Drama",
+      "rating": 6.7,
+      "added_at": "2026-04-27T00:50:04.634818"
+    },
+    {
+      "title": "Dhoom 3",
+      "year": 2013,
+      "genre": "Action,Crime,Drama",
+      "rating": 5.4,
+      "added_at": "2026-04-27T00:50:05.013377"
+    },
+    {
+      "title": "Lage Raho Munna Bhai",
+      "year": 2006,
+      "genre": "Comedy,Drama,Romance",
+      "rating": 8.0,
+      "added_at": "2026-04-27T01:10:43.633340"
+    }
+  ],
+  "disliked_movies": [],
+  "preferred_genres": {
+    "drama": 10,
+    "action": 10,
+    "adventure": 10
+  },
+  "avoided_genres": {},
+  "preferred_languages": {},
+  "preferred_directors": [
+    "Jon Favreau",
+    "Louis Leterrier",
+    "Kenneth Branagh",
+    "Joe Johnston",
+    "Shane Black",
+    "Alan Taylor",
+    "Anthony Russo, Joe Russo",
+    "James Gunn",
+    "Joss Whedon",
+    "Peyton Reed",
+    "Scott Derrickson",
+    "Jon Watts",
+    "Taika Waititi",
+    "Anna Boden, Ryan Fleck",
+    "Cate Shortland",
+    "Destin Daniel Cretton",
+    "Chloé Zhao",
+    "Sam Raimi",
+    "Ryan Coogler",
+    "Nia DaCosta",
+    "Shawn Levy",
+    "Julius Onah",
+    "Sanjay Gadhvi",
+    "Vijay Krishna Acharya",
+    "Rajkumar Hirani"
+  ],
+  "preferred_actors": [
+    "Aamir Khan",
+    "Tom Cruise",
+    "Elizabeth Olsen",
+    "John Cena",
+    "Ryan Reynolds",
+    "Sanjay Dutt",
+    "Ryan Gosling"
+  ],
+  "inferred_mood_tags": [],
+  "last_updated": "2026-04-28T06:48:41"
+}

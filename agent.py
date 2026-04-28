@@ -1,17 +1,42 @@
 from google.adk.agents.llm_agent import Agent
 
 
+# ============================
+# Personalization helpers
+# ============================
+
+PROFILE_FILE = "user_profile.json"
+
+try:
+    from profile_builder import load_profile_context, extract_and_update_from_chat
+    _PROFILE_BUILDER_AVAILABLE = True
+except ImportError:
+    _PROFILE_BUILDER_AVAILABLE = False
+    def load_profile_context(profile_path=PROFILE_FILE): return ""
+    def extract_and_update_from_chat(user_msg, ai_msg): pass
+
+
+def _build_agent_instruction() -> str:
+    """Build agent instruction, optionally prepending personalization context."""
+    base = (
+        "You are an elite movie expert and CineGuide assistant. "
+        "STRICT RULE: NEVER guess or hallucinate cast members, directors, or plot details. "
+        "If a user mentions a movie, you MUST call 'get_movie_from_db' to fetch the real data. "
+        "If you are recommending movies, use 'search_movies_in_db' or 'get_top_movies'. "
+        "Only talk about facts found in the database tools. "
+        "Use the USER TASTE PROFILE below to personalize your recommendations."
+    )
+    context = load_profile_context(PROFILE_FILE)
+    if context:
+        return base + "\n\n" + context
+    return base
+
+
 root_agent = Agent(
     model='gemini-2.5-flash',
     name='root_agent',
     description='A movie recommendation assistant with access to a local IMDB and Rotten Tomatoes database.',
-    instruction=(
-        'You are a helpful movie recommendation assistant with access to a comprehensive local movie database. '
-        'When users ask about specific movies or request recommendations, use the available tools to query the database. '
-        'Always provide complete information including IMDB ratings, Rotten Tomatoes scores, cast, plot, and other details when available. '
-        'If a user mentions a movie title, immediately use get_movie_from_db to fetch its details. '
-        'Be conversational and helpful in your responses.'
-    ),
+    instruction=_build_agent_instruction(),
 )
 
 # ============================
@@ -22,6 +47,24 @@ import sqlite3
 from typing import List, Optional
 
 DB_FILE = "movies.db"
+
+# ============================
+# Aliases & Normalization
+# ============================
+
+MOVIE_ALIASES = {
+    "avengers doomsday": "Avengers: Doomsday",
+    "avengers 5": "Avengers: Doomsday",
+    "mario galaxy": "The Super Mario Galaxy Movie",
+    "mario movie 2": "The Super Mario Galaxy Movie",
+    "mario 2": "The Super Mario Galaxy Movie",
+    "dhurandhar 2": "Dhurandhar: The Revenge",
+}
+
+def normalize_text(text: str) -> str:
+    """Remove punctuation and spaces for fuzzy comparison."""
+    import re
+    return re.sub(r'[^a-zA-Z0-9]', '', text).lower()
 
 def get_movie_from_db(title: str) -> str:
     """
@@ -37,16 +80,33 @@ def get_movie_from_db(title: str) -> str:
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         
-        # Search for movie (case-insensitive, partial match)
+        # 1. Normalize and resolve aliases
+        clean_query = title.lower().strip()
+        target_title = MOVIE_ALIASES.get(clean_query, title)
+        norm_query = normalize_text(target_title)
+
+        # 2. SQL Search (Try exact, then partial)
         cursor.execute("""
             SELECT * FROM movies 
-            WHERE LOWER(title) LIKE LOWER(?)
+            WHERE (LOWER(title) = LOWER(?) OR LOWER(title) LIKE LOWER(?))
             AND enriched = 1
             ORDER BY imdb_rating DESC, imdb_votes DESC
             LIMIT 1
-        """, (f'%{title}%',))
+        """, (target_title, f'%{target_title}%'))
         
         row = cursor.fetchone()
+        
+        # 3. Fuzzy Fallback: Search for normalized title
+        if not row:
+            # Check for title matches by removing all punctuation/spaces
+            cursor.execute("SELECT * FROM movies WHERE enriched = 1")
+            candidates = cursor.fetchall()
+            for cand in candidates:
+                cand_title = cand[1] # title column
+                if norm_query in normalize_text(cand_title) or normalize_text(cand_title) in norm_query:
+                    row = cand
+                    break
+        
         conn.close()
         
         if not row:
@@ -112,24 +172,38 @@ def search_movies_in_db(query: str, limit: int = 10) -> str:
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         
+        # 1. Standard Search
         cursor.execute("""
-            SELECT title, year, imdb_rating, genres, imdb_id
+            SELECT title, year, imdb_rating, genres, imdb_id, enriched
             FROM movies
             WHERE (LOWER(title) LIKE LOWER(?) OR LOWER(genres) LIKE LOWER(?))
-            AND imdb_rating IS NOT NULL
             ORDER BY imdb_rating DESC, imdb_votes DESC
             LIMIT ?
         """, (f'%{query}%', f'%{query}%', limit))
         
         rows = cursor.fetchall()
+        
+        # 2. Fuzzy/Alias Fallback (if no results or few results)
+        if len(rows) < 3:
+            cursor.execute("SELECT title, year, imdb_rating, genres, imdb_id, enriched FROM movies WHERE enriched = 1")
+            all_enriched = cursor.fetchall()
+            norm_query = normalize_text(query)
+            
+            seen_titles = {r[0].lower() for r in rows}
+            for candidate in all_enriched:
+                if norm_query in normalize_text(candidate[0]) and candidate[0].lower() not in seen_titles:
+                    rows.append(candidate)
+                    if len(rows) >= limit: break
+
         conn.close()
         
         if not rows:
             return f"❌ No movies found matching: {query}"
         
         result = f"🔍 **Search Results for '{query}':**\n\n"
-        for idx, (title, year, rating, genres, imdb_id) in enumerate(rows, 1):
-            result += f"{idx}. **{title}** ({year}) - {rating}/10\n"
+        for idx, (title, year, rating, genres, imdb_id, enriched) in enumerate(rows, 1):
+            rating_display = f"{rating}/10" if rating else "N/A"
+            result += f"{idx}. **{title}** ({year}) - {rating_display}\n"
             result += f"   Genre: {genres}\n"
             result += f"   IMDB: https://www.imdb.com/title/{imdb_id}/\n\n"
         
@@ -257,7 +331,11 @@ async def run_cli():
             new_message=message
         ):
             if event.is_final_response() and event.content and event.content.parts:
-                print(event.content.parts[0].text)
+                response_text = event.content.parts[0].text
+                print(response_text)
+                # Part 3: Real-time profile extraction
+                if _PROFILE_BUILDER_AVAILABLE:
+                    extract_and_update_from_chat(user_input, response_text)
 
 if __name__ == "__main__":
     print("🎬 CineGuide Agent with Local Database!")

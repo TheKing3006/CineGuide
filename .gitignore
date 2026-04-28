@@ -47,3 +47,28 @@ title.ratings.tsv
 
 # Temporary/development files
 addmov
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Secrets and Config
+.env
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs and databases
+logs/
+# Note: we are NOT ignoring movies.db because you requested to push it.
+# However, we will track it via LFS.

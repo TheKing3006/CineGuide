@@ -5,6 +5,9 @@ Run this ONCE to build your database, then the agent queries it locally.
 """
 
 import os
+import sys
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 import sqlite3
 import requests
 import gzip
@@ -17,14 +20,29 @@ import csv
 # Configuration
 # ============================
 
-OMDB_API_KEY = "dd21cf1d"  # Your OMDb API key
+OMDB_API_KEY = "afa9c21d"  # Your OMDb API key
 DB_FILE = "movies.db"
+
+# Load API keys from .env if present
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+env_file = Path(".env")
+if env_file.exists() and not TMDB_API_KEY:
+    with open(env_file, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith("TMDB_API_KEY=") and not line.startswith("#"):
+                TMDB_API_KEY = line.split("=", 1)[1].strip().strip('"').strip("'")
+                break
+
+if not TMDB_API_KEY:
+    print("⚠️  WARNING: TMDB_API_KEY not found! Posters will not be downloaded.")
+    print("Please set it in your .env file: TMDB_API_KEY=your_key_here")
 
 # IMDB official dataset URLs (updated daily)
 IMDB_TITLE_BASICS_URL = "https://datasets.imdbws.com/title.basics.tsv.gz"
 IMDB_RATINGS_URL = "https://datasets.imdbws.com/title.ratings.tsv.gz"
 
-# We'll fetch top N movies to enrich with OMDb (to stay within API limits)
+# We'll fetch top N movies to enrich with OMDb & TMDB
 TOP_N_MOVIES = 1000  # Adjust based on your API key limits
 
 # ============================
@@ -164,12 +182,36 @@ def load_imdb_ratings(tsv_file):
     print(f"✅ Updated ratings for {count} movies")
 
 # ============================
-# Enrich with OMDb API
+# Enrich with OMDb & TMDB API
 # ============================
 
+def fetch_tmdb_poster(imdb_id):
+    """Fetch high-quality poster URL from TMDB using IMDb ID."""
+    if not TMDB_API_KEY:
+        return None
+        
+    try:
+        url = f"https://api.themoviedb.org/3/find/{imdb_id}"
+        params = {
+            'api_key': TMDB_API_KEY,
+            'external_source': 'imdb_id'
+        }
+        resp = requests.get(url, params=params, timeout=10)
+        
+        if resp.status_code == 200:
+            data = resp.json()
+            results = data.get('movie_results', [])
+            if results and len(results) > 0:
+                path = results[0].get('poster_path')
+                if path:
+                    return f"https://image.tmdb.org/t/p/w500{path}"
+    except Exception as e:
+        print(f"    ⚠️  TMDB Error for {imdb_id}: {e}")
+    return None
+
 def enrich_top_movies():
-    """Enrich top-rated movies with detailed OMDb data."""
-    print(f"🎬 Enriching top {TOP_N_MOVIES} movies with OMDb data...")
+    """Enrich top-rated movies with detailed OMDb and TMDB data."""
+    print(f"🎬 Enriching top {TOP_N_MOVIES} movies with OMDb & TMDB data...")
     
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
@@ -216,6 +258,9 @@ def enrich_top_movies():
                     elif 'Audience' in source:
                         rt_audience = rating.get('Value')
                 
+                # Fetch high-quality poster from TMDB
+                poster_url = fetch_tmdb_poster(imdb_id)
+                
                 # Update database with enriched data
                 cursor.execute("""
                     UPDATE movies SET
@@ -244,6 +289,7 @@ def enrich_top_movies():
                     data.get('Language'),
                     data.get('Country'),
                     data.get('Awards'),
+                    poster_url,  # TMDB poster URL
                     data.get('BoxOffice'),
                     rt_critics,
                     rt_audience,
@@ -260,7 +306,39 @@ def enrich_top_movies():
             continue
     
     conn.close()
-    print(f"✅ Enriched {len(movies)} movies with OMDb data")
+    print(f"✅ Enriched {len(movies)} movies with OMDb & TMDB data")
+
+def backfill_tmdb_posters():
+    """Fetch TMDB posters for already enriched movies that are missing them."""
+    if not TMDB_API_KEY:
+        return
+        
+    print(f"🖼️ Backfilling TMDB posters for existing movies...")
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    
+    # Find enriched movies that either have no poster or have the BoxOffice bug (doesn't start with http)
+    cursor.execute("""
+        SELECT imdb_id, title 
+        FROM movies 
+        WHERE enriched = 1 
+        AND (poster IS NULL OR poster NOT LIKE 'http%')
+        ORDER BY imdb_votes DESC
+    """)
+    
+    movies = cursor.fetchall()
+    
+    for idx, (imdb_id, title) in enumerate(movies, 1):
+        print(f"  [{idx}/{len(movies)}] Fetching poster: {title}")
+        poster_url = fetch_tmdb_poster(imdb_id)
+        if poster_url:
+            cursor.execute("UPDATE movies SET poster = ? WHERE imdb_id = ?", (poster_url, imdb_id))
+            conn.commit()
+        time.sleep(0.5) # Rate limiting
+        
+    conn.close()
+    if movies:
+        print(f"✅ Backfilled posters for {len(movies)} movies")
 
 # ============================
 # Main Execution
@@ -297,8 +375,11 @@ def main():
     load_imdb_basics(basics_tsv)
     load_imdb_ratings(ratings_tsv)
     
-    # Step 4: Enrich with OMDb
+    # Step 4: Enrich with OMDb & TMDB
     enrich_top_movies()
+    
+    # Step 5: Backfill posters for previously enriched movies
+    backfill_tmdb_posters()
     
     print("\n" + "=" * 50)
     print("✅ DATABASE BUILD COMPLETE!")
